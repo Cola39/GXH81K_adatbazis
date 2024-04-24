@@ -1,0 +1,4 @@
+use Gyak_compass
+db.receptek.find({title: {$regex: /Tacos/}})
+db.receptek.aggregate([{$group: {_id: "$type", osszeg: {$sum: "$cook_time"}}}])
+db.receptek.find({servings: 4}).count()
