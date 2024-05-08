@@ -1,0 +1,25 @@
+set ev 2024
+
+get ev
+
+del nap
+
+set nap 8 EX 10
+
+expire ev 5
+
+hset auto rendszam abc123 tipus trabant evjarat 1970
+
+rpush tantargyak adatbazis matematika
+
+lrange tantargyak 0 -1
+
+sadd napok hetfo kedd szerda csutortok
+
+sadd munkanapok hetfo szerda
+
+sunion napok munkanapok
+
+zadd zh 25 juci 12 laci 85 maci
+
+zrange zh 0 -1 withscores
