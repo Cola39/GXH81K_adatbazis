@@ -1,0 +1,84 @@
+REDIS
+
+12.
+> HSET dolgozo:1 nev "Nagy Eva" munkakor titkarno kod 1
+> HSET dolgozo:2 nev "Kiss Ilona" munkakor konyvelo kod 2
+
+13.
+> HSET projekt:1 projektkod 1 projektnev EURO-33 dolgozokod 1
+> HSET projekt:2 projektkod 3 projektnev TRANS-22 dolgozokod 2
+
+> HSET munka:1 dolgozokod 1
+> HSET munka:3 dolgozokod 2
+
+
+
+CASSANDRA
+
+18.
+show version;
+
+19.
+desc keyspaces;
+
+use "11gyak";
+
+desc tables;
+
+SELECT COUNT(*)
+FROM movies_and_tv;
+
+20.
+desc table movies_and_tv;
+
+SELECT title
+FROM movies_and_tv
+WHERE release_year = 2018
+LIMIT 5
+ALLOW FILTERING;
+
+21.
+SELECT type, release_year, COUNT(*)
+FROM movies_and_tv
+GROUP BY type, release_year;
+
+23.
+CREATE TABLE Szemely
+(
+nev TEXT,
+szulev int,
+foglalkozas TEXT,
+PRIMARY KEY ((nev, szulev), foglalkozas)
+);
+
+24.
+INSERT INTO Szemely (nev, szulev, foglalkozas) VALUES('Kiss Bela', 2000, 'lakatos');
+INSERT INTO Szemely (nev, szulev, foglalkozas) VALUES('Nagy Ivo', 1999, 'diak');
+INSERT INTO Szemely (nev, szulev, foglalkozas) VALUES('Toth Otto', 1980, 'pincer');
+
+SELECT *
+FROM Szemely;
+
+27.
+ALTER TABLE Szemely
+ADD vegzettseg LIST<TEXT>;
+
+UPDATE Szemely
+SET vegzettseg = ['gepesz', 'muszeresz']
+WHERE nev = 'Kiss Bela' AND szulev = 2000 AND foglalkozas = 'lakatos';
+
+28.
+ALTER TABLE Szemely
+ADD nyelvtudas SET<TEXT>;
+
+UPDATE Szemely
+SET nyelvtudas = {'nemet', 'angol'}
+WHERE nev = 'Toth Otto' AND szulev = 1980 AND foglalkozas = 'pincer';
+
+29.
+ALTER TABLE Szemely
+ADD Autok MAP<TEXT, TEXT>;
+
+UPDATE Szemely
+SET autok['Skoda Fabia'] = 'abc-111', autok['Audi A4'] = 'xyz-222'
+WHERE nev = 'Nagy Ivo' AND szulev = 1999 AND foglalkozas = 'diak';
