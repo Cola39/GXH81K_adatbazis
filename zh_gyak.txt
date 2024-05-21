@@ -1,3 +1,228 @@
-REDIS
+ -------
+| REDIS |
+ -------
+
 
 3.
+
+> SET ev 2021 EX 10
+"OK"
+
+> SET nap 26 EX 10
+"OK"
+
+> SET honap 4 EX 10
+"OK"
+
+
+4.
+
+> HSET auto rendszam xxx-111 tipus 'Skoda Fabia' evjarat 2012 ertek 1500000
+(integer) 1
+
+
+5.
+
+> RPUSH tantargyak 'programozas alapjai' matematika adatbaziskezeles
+(integer) 3
+
+> RPUSH tantargyak 'operacios rendszerek'
+(integer) 4
+
+
+6.
+
+> SADD numbers1 10 20 30 40 50 60
+(integer) 6
+
+> SADD numbers2 15 30 45 60
+(integer) 4
+
+> SINTER numbers1 numbers2
+1) "30"
+2) "60"
+
+
+7.
+
+> ZADD szemelyek 15 Andras 20 Peter 18 Juli
+(integer) 3
+
+> ZCOUNT szemelyek 16 18
+(integer) 1
+
+
+8.
+
+> keys *a*
+1) "auto"
+2) "tantargyak"
+
+12.
+
+> HSET dolgozo:1 nev 'Nagy Eva' munkakor titkarno kod 1
+(integer) 3
+
+> HSET dolgozo:2 nev 'Kiss Ilona' munkakor konyvelo kod 2
+(integer) 3
+
+
+13.
+
+> HSET projekt:1 projektkod 1 projektnev EURO-33 dolgozokod 1
+(integer) 3
+
+> HSET projekt:2 projektkod 3 projektnev TRANS-22 dolgozokod 2
+(integer) 3
+
+
+14.
+
+> ZADD dolgozo_nev 1 'Nagy Eva' 2 'Kiss Ilona'
+(integer) 2
+
+
+-------------------------------------------------------------------------------------------------------
+
+
+ -----------
+| CASSANDRA |
+ -----------
+
+
+18.
+
+token@cqlsh> SHOW VERSION ;
+[cqlsh 6.8.0 | Cassandra 4.0.0.6816 | CQL spec 3.4.5 | Native protocol v4 | TLS]
+
+
+19.
+
+token@cqlsh> USE "Movies";
+token@cqlsh:Movies> SELECT COUNT(*)
+          ... FROM movies_and_tv ;
+
+ count
+-------
+  3772
+
+(1 rows)
+
+
+20.
+
+token@cqlsh:Movies> SELECT title
+          ... FROM movies_and_tv 
+          ... WHERE type = 'Movie' AND release_year = 2018
+          ... LIMIT 3 ;
+
+ title
+---------------
+         #Roxy
+    14 Cameras
+ 1st Summoning
+
+(3 rows)
+
+
+21.
+
+token@cqlsh:Movies> SELECT type, release_year, COUNT(*)
+          ... FROM movies_and_tv
+          ... GROUP BY type, release_year ;
+
+ type    | release_year | count
+---------+--------------+-------
+   Movie |         1958 |     2
+   Movie |         1965 |     2
+ TV Show |         2018 |    19
+...
+   Movie |         1969 |     2
+   Movie |         1982 |    11
+   Movie |         1992 |    14
+
+(84 rows)
+
+
+23.
+
+token@cqlsh:Movies> CREATE TABLE Szemely
+          ... (
+          ... nev text,
+          ... szulev int,
+          ... foglalkozas text,
+          ... PRIMARY KEY ((nev, szulev), foglalkozas)
+          ... ) ;
+
+24.
+
+token@cqlsh:Movies> INSERT INTO szemely (nev, szulev, foglalkozas) VALUES('Kiss Bela', 2000, 'lakatos') ;
+token@cqlsh:Movies> INSERT INTO szemely (nev, szulev, foglalkozas) VALUES('Nagy Ivo', 1999, 'diak') ;
+token@cqlsh:Movies> INSERT INTO szemely (nev, szulev, foglalkozas) VALUES('Toth Otto', 1980, 'pincer') ;
+token@cqlsh:Movies> SELECT *
+          ... FROM szemely ;
+
+ nev       | szulev | foglalkozas
+-----------+--------+-------------
+  Nagy Ivo |   1999 |        diak
+ Kiss Bela |   2000 |     lakatos
+ Toth Otto |   1980 |      pincer
+
+(3 rows)
+
+
+25.
+
+token@cqlsh:Movies> CREATE INDEX i_foglalkozas ON szemely (foglalkozas) ;
+
+
+26.
+
+token@cqlsh:Movies> SELECT nev
+          ... FROM szemely
+          ... WHERE foglalkozas IN ('pincer', 'lakatos')
+          ... ALLOW FILTERING ;
+
+ nev
+-----------
+ Kiss Bela
+ Toth Otto
+
+(2 rows)
+
+
+27.
+
+token@cqlsh:Movies> ALTER TABLE szemely
+          ... ADD vegzettseg LIST<text> ;
+token@cqlsh:Movies> UPDATE szemely
+          ... SET vegzettseg = ['gepesz', 'muszeresz']
+          ... WHERE nev = 'Kiss Bela' AND szulev = 2000 AND foglalkozas = 'lakatos' ;
+
+
+28.
+
+token@cqlsh:Movies> ALTER TABLE szemely 
+          ... ADD Nyelvtudas SET<text> ;
+token@cqlsh:Movies> UPDATE szemely 
+          ... SET nyelvtudas = {'angol', 'francia'}
+          ... WHERE nev = 'Nagy Ivo' AND szulev = 1999 AND foglalkozas = 'diak' ;
+
+
+29.
+
+token@cqlsh:Movies> ALTER TABLE szemely 
+          ... ADD Autok MAP<text, text> ;
+token@cqlsh:Movies> UPDATE szemely 
+          ... SET autok['Skoda Fabia'] = 'abc-111', autok['Audi A4'] = 'xyz-222'
+          ... WHERE nev = 'Kiss Bela' AND szulev = 2000 AND foglalkozas = 'lakatos' ;
+
+
+30.
+
+token@cqlsh:Movies> UPDATE szemely 
+          ... SET nyelvtudas = nyelvtudas + {'nemet'}
+          ... WHERE nev = 'Nagy Ivo' AND szulev = 1999 AND foglalkozas = 'diak' ;
+token@cqlsh:Movies> UPDATE szemely
+          ... SET vegzettseg  = vegzettseg + ['barmixer']
+          ... WHERE nev = 'Toth Otto' AND szulev = 1980 AND foglalkozas = 'pincer' ;
